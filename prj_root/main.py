@@ -2,7 +2,8 @@
 # cd /mnt/external_disk/Code_projects/Drug_development/DeepDTA_PyTorch/prj_root
 
 # ================================================================================
-# Train
+# @ Train
+
 # rm e.l && python main.py \
 # --start_mode="train" \
 # --epoch=9 \
@@ -11,6 +12,7 @@
 # --train_method="deepdta" \
 # --max_length_of_smiles_sequence=100 \
 # --max_length_of_protein_sequence=1000 \
+# --embedding_vector_dimension_for_smiles_and_protein=128 \
 # 2>&1 | tee -a e.l && code e.l
 
 # ================================================================================
