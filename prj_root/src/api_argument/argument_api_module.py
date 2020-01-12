@@ -14,5 +14,6 @@ class Argument_API_class(argparse.ArgumentParser):
     self.add_argument("--embedding_vector_dimension_for_smiles_and_protein",default=128,help="integer")
     self.add_argument("--dataset_path",default="../Data/kiba",help="data directory")
     self.add_argument("--with_label",default=True)
+    self.add_argument("--problem_type",default=1)
 
     self.args=self.parse_args()
