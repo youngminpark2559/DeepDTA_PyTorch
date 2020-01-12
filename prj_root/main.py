@@ -6,8 +6,8 @@
 
 # rm e.l && python main.py \
 # --start_mode="train" \
-# --epoch=9 \
-# --batch_size=2 \
+# --epoch=2 \
+# --batch_size=256 \
 # --task_mode="train" \
 # --train_method="deepdta" \
 # --max_length_of_smiles_sequence=100 \
@@ -15,7 +15,13 @@
 # --embedding_vector_dimension_for_smiles_and_protein=128 \
 # --with_label=True \
 # --problem_type=1 \
+# --num_windows 32 \
+# --smi_window_lengths 4 8 \
+# --seq_window_lengths 8 12 \
 # 2>&1 | tee -a e.l && code e.l
+
+# self.add_argument("--smi_window_lengths",nargs="*",type=int,default=[35,40,50,60,70,80,90])
+# self.add_argument("--seq_window_lengths",nargs="*",type=int,default=[35,40,50,60,70,80,90])
 
 # ================================================================================
 # dir_where_text_file_for_image_paths_is_in="./../Data"
