@@ -14,6 +14,7 @@
 # --max_length_of_protein_sequence=1000 \
 # --embedding_vector_dimension_for_smiles_and_protein=128 \
 # --with_label=True \
+# --problem_type=1 \
 # 2>&1 | tee -a e.l && code e.l
 
 # ================================================================================
