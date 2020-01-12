@@ -25,6 +25,9 @@ class DeepDTA(nn.Module):
   def __init__(self,args):
     super(DeepDTA,self).__init__()
     
+    # ================================================================================
+    # @ Embedding
+
     self.embedding_for_smiles = nn.Embedding(int(args.max_length_of_smiles_sequence),int(args.embedding_vector_dimension_for_smiles_and_protein))
     self.embedding_for_protein = nn.Embedding(int(args.max_length_of_protein_sequence),int(args.embedding_vector_dimension_for_smiles_and_protein))
     # print("self.embedding_for_smiles.weight",self.embedding_for_smiles.weight)
@@ -53,6 +56,45 @@ class DeepDTA(nn.Module):
     # self.embedding_for_smiles torch.Size([100, 128])
     # self.embedding_for_protein torch.Size([1000, 128])
 
+    # ================================================================================
+    # @ Convolution for smiles
+    
+    self.conv1_for_smiles=nn.Sequential(
+      nn.Conv2d(200,100,kernel_size=3,padding=1))
+    self.conv2_for_smiles=nn.Sequential(
+      nn.Conv2d(200,100,kernel_size=3,padding=1))
+    self.conv3_for_smiles=nn.Sequential(
+      nn.Conv2d(200,100,kernel_size=3,padding=1))
+
+    self.max_pool=nn.MaxPool1d(3,stride=2)
+
+    # ================================================================================
+    self.conv1_for_proteins=nn.Sequential(
+      nn.Conv2d(200,100,kernel_size=3,padding=1))
+    self.conv2_for_proteins=nn.Sequential(
+      nn.Conv2d(200,100,kernel_size=3,padding=1))
+    self.conv3_for_proteins=nn.Sequential(
+      nn.Conv2d(200,100,kernel_size=3,padding=1))
+
+    self.max_pool=nn.MaxPool1d(3,stride=2)
+
+    # ================================================================================
+    # @ Fully connected layer
+
+    self.fc1=nn.Linear(input_size, output_size)
+    self.relu1=nn.ReLU()
+    self.dropout1=torch.nn.Dropout(p=dropout_probability)
+    self.fc2=nn.Linear(input_size, output_size)
+    self.relu2=nn.ReLU()
+    self.dropout2=torch.nn.Dropout(p=dropout_probability)
+    self.fc3=nn.Linear(input_size, output_size)
+    self.relu3=nn.ReLU()
+
+    # ================================================================================
+    # @ Output layer
+
+    self.fc_out=nn.Linear(input_size,1)
+
   def forward(self,batch_drugs,batch_proteins):
 
     # ================================================================================
@@ -66,7 +108,11 @@ class DeepDTA(nn.Module):
     # print("embedded_protein_data",embedded_protein_data.shape)
     # embedded_smiles_data torch.Size([256, 100, 128])
     # embedded_protein_data torch.Size([256, 1000, 128])
-    afaf
+    
+    # ================================================================================
+    # @ Perform convolution
+
+
 
     # ================================================================================
 
