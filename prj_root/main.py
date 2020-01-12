@@ -9,6 +9,8 @@
 # --batch_size=2 \
 # --task_mode="train" \
 # --train_method="deepdta" \
+# --max_length_of_smiles_sequence=100 \
+# --max_length_of_protein_sequence=1000 \
 # 2>&1 | tee -a e.l && code e.l
 
 # ================================================================================
