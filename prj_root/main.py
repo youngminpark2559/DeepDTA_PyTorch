@@ -1,5 +1,5 @@
 # conda activate py36gputorch100 && \
-# cd /mnt/external_disk/Code_projects/Drug_development/DeepDTA_PyTorch/V_00001/prj_root
+# cd /mnt/external_disk/Code_projects/Drug_development/DeepDTA_PyTorch/prj_root
 
 # ================================================================================
 # Train
