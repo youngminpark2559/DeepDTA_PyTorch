@@ -6,6 +6,7 @@ from collections import OrderedDict
 import numpy as np
 import pandas as pd
 from random import shuffle
+from copy import deepcopy
 
 # ================================================================================
 import torch.utils.data as data
@@ -72,10 +73,10 @@ def label_sequence(line, MAX_SEQ_LEN, smi_ch_ind):
 
   return X
 
-def nfold_1_2_3_setting_sample(XD, XT, Y, label_row_inds, label_col_inds, measure, runmethod,  FLAGS, dataset):
+def nfold_1_2_3_setting_sample(XD, XT, Y, label_row_inds, label_col_inds, args):
 
     bestparamlist = []
-    test_set, outer_train_sets = dataset.read_sets(FLAGS)
+    test_set, outer_train_sets = read_sets(args)
 
     # ================================================================================
     foldinds = len(outer_train_sets)
@@ -119,11 +120,18 @@ def nfold_1_2_3_setting_sample(XD, XT, Y, label_row_inds, label_col_inds, measur
     # print("val_sets",val_sets)
     # print("train_sets",train_sets)
 
+    # print("test_sets",np.array(test_sets).shape)
+    # print("val_sets",np.array(val_sets).shape)
+    # print("train_sets",np.array(train_sets).shape)
+    # test_sets (5, 19709)
+    # val_sets (5, 19709)
+    # train_sets (5, 78836)
+
     # ================================================================================
     # @ Perform training
 
-    bestparamind, best_param_list, bestperf, all_predictions_not_need, losses_not_need = \
-        general_nfold_cv(XD, XT,  Y, label_row_inds, label_col_inds, measure, runmethod, FLAGS, train_sets, val_sets)
+    bestparamind, best_param_list, bestperf, all_predictions_not_need, losses_not_need = general_nfold_cv(
+      XD, XT,  Y, label_row_inds, label_col_inds, measure, runmethod, FLAGS, train_sets, val_sets)
     # afaf 4: general_nfold_cv(XD, XT,  Y, label_row_inds, label_col_inds, measure, runmethod, FLAGS, train_sets, val_sets)
     
     # ================================================================================
@@ -377,17 +385,17 @@ def general_nfold_cv(XD, XT,  Y, label_row_inds, label_col_inds, prfmeasure, run
     
     return bestpointer, best_param_list, bestperf, all_predictions, all_losses
 
-def read_sets(self, FLAGS): ### fpath should be the dataset folder /kiba/ or /davis/
-    fpath = FLAGS.dataset_path
-    setting_no = FLAGS.problem_type
+def read_sets(args): ### fpath should be the dataset folder /kiba/ or /davis/
+    fpath=args.dataset_path
+    setting_no=args.problem_type
     # print("fpath",fpath)
     # print("setting_no",setting_no)
     # data/kiba/
     # 1
 
     # ================================================================================
-    test_fold = json.load(open(fpath + "folds/test_fold_setting" + str(setting_no)+".txt"))
-    train_folds = json.load(open(fpath + "folds/train_fold_setting" + str(setting_no)+".txt"))
+    test_fold = json.load(open(fpath + "/folds/test_fold_setting" + str(setting_no)+".txt"))
+    train_folds = json.load(open(fpath + "/folds/train_fold_setting" + str(setting_no)+".txt"))
     # print("test_fold",test_fold)
     # print("train_folds",train_folds)
     # [34121, 51548, 12611, 104850, 23744, 79716, 47565, 6166, 113707, 26852, 29930, 90721, 58109, 6584, 
@@ -579,7 +587,7 @@ class DeepDTA_Dataset(data.Dataset):
     # (0,6) is true
     # ...
 
-    label_row_inds,label_col_inds= np.where(np.isnan(Y)==False)
+    label_row_inds,label_col_inds= np.where(np.isnan(after_where)==False)
 
     # ================================================================================
     # if not os.path.exists(figdir):
@@ -589,7 +597,9 @@ class DeepDTA_Dataset(data.Dataset):
     # logs/1578804744.5187547/
 
     # ================================================================================
-    S1_avgperf, S1_avgloss, S1_teststd = nfold_1_2_3_setting_sample(XD, XT, Y, label_row_inds, label_col_inds, perfmeasure, deepmethod, FLAGS, dataset)
+    S1_avgperf, S1_avgloss, S1_teststd = nfold_1_2_3_setting_sample(
+      int_based_label_of_all_smiles_sequences_np,int_based_label_of_all_protein_sequences_np,
+      smile_protein_binding_affinity_score_data_np,label_row_inds,label_col_inds,args)
 
   # ================================================================================
   def __len__(self):
