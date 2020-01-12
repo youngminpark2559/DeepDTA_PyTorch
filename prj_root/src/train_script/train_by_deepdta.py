@@ -17,7 +17,7 @@ from src.utils_for_dataset import dataset_deepdta as dataset_deepdta
 # ================================================================================
 def train(args):
 
-  deepdta_obj=network_deepdta.DeepDTA(args)
+  deepdta_obj=network_deepdta.DeepDTA(args).cuda()
   # print("deepdta_obj",deepdta_obj)
 
   for one_ep in range(int(args.epoch)): # @ Iterates all epochs
@@ -38,9 +38,9 @@ def train(args):
       # idx 0
       # len(data) 3
       
-      batch_drugs=data[0]
-      batch_proteins=data[1]
-      batch_affinities=data[2]
+      batch_drugs=data[0].long().cuda()
+      batch_proteins=data[1].long().cuda()
+      batch_affinities=data[2].long().cuda()
       # print("batch_drugs",batch_drugs)
       # print("batch_proteins",batch_proteins)
       # print("batch_affinities",batch_affinities)
@@ -50,6 +50,6 @@ def train(args):
       # batch_drugs torch.Size([256, 100])
       # batch_proteins torch.Size([256, 1000])
       # batch_affinities torch.Size([256])
+
+      deepdta_obj(batch_drugs,batch_proteins)
       
-
-

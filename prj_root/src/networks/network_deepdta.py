@@ -53,13 +53,20 @@ class DeepDTA(nn.Module):
     # self.embedding_for_smiles torch.Size([100, 128])
     # self.embedding_for_protein torch.Size([1000, 128])
 
-  def forward(self,smiles_data,protein_data):
-    
+  def forward(self,batch_drugs,batch_proteins):
+
     # ================================================================================
     # @ Embed smiles and protein data
 
-    embedded_smiles_data=self.embedding_for_smiles(smiles_data)
-    embedded_protein_data=self.embedding_for_protein(protein_data)
+    embedded_smiles_data=self.embedding_for_smiles(batch_drugs)
+    embedded_protein_data=self.embedding_for_protein(batch_proteins)
+    # print("embedded_smiles_data",embedded_smiles_data)
+    # print("embedded_protein_data",embedded_protein_data)
+    # print("embedded_smiles_data",embedded_smiles_data.shape)
+    # print("embedded_protein_data",embedded_protein_data.shape)
+    # embedded_smiles_data torch.Size([256, 100, 128])
+    # embedded_protein_data torch.Size([256, 1000, 128])
+    afaf
 
     # ================================================================================
 
