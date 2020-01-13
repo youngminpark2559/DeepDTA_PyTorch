@@ -89,7 +89,7 @@ class DeepDTA(nn.Module):
     # ================================================================================
     # @ Output layer
 
-    self.fc_out=nn.Linear(512,1)
+    self.fc_out=nn.Linear(512,256)
 
   def forward(self,batch_drugs,batch_proteins):
 
@@ -153,4 +153,4 @@ class DeepDTA(nn.Module):
     # print("out_from_fc_out",out_from_fc_out)
     # out_from_fc_out tensor([0.0098], device='cuda:0', grad_fn=<AddBackward0>)
 
-    return x
+    return out_from_fc_out
