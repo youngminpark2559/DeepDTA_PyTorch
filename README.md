@@ -1,3 +1,3 @@
 # DeepDTA_PyTorch
 
-- The project is under construction
+- This project is under construction
