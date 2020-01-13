@@ -14,10 +14,15 @@ from src.networks import network_deepdta as network_deepdta
 from src.utils_for_dataset import dataset_deepdta as dataset_deepdta
 
 # ================================================================================
+criterion=nn.MSELoss()
+
+# ================================================================================
 def train(args):
 
   deepdta_obj=network_deepdta.DeepDTA(args).cuda()
   # print("deepdta_obj",deepdta_obj)
+
+  optimizer=torch.optim.Adam(deepdta_obj.parameters(),lr=0.01)
 
   for one_ep in range(int(args.epoch)): # @ Iterates all epochs
 
@@ -36,10 +41,10 @@ def train(args):
       # print("len(data)",len(data))
       # idx 0
       # len(data) 3
-      
+
       batch_drugs=data[0].long().cuda()
       batch_proteins=data[1].long().cuda()
-      batch_affinities=data[2].long().cuda()
+      batch_affinities=data[2].float().cuda()
       # print("batch_drugs",batch_drugs)
       # print("batch_proteins",batch_proteins)
       # print("batch_affinities",batch_affinities)
@@ -50,5 +55,21 @@ def train(args):
       # batch_proteins torch.Size([256, 1000])
       # batch_affinities torch.Size([256])
 
-      deepdta_obj(batch_drugs,batch_proteins)
-      
+      if batch_affinities.shape[0]!=256:
+        continue
+
+      predicted_value=deepdta_obj(batch_drugs,batch_proteins)
+      # print("predicted_value",predicted_value.shape)
+      # predicted_value tensor([0.0069], device='cuda:0', grad_fn=<AddBackward0>)
+
+      loss_value=criterion(predicted_value,batch_affinities)
+      print("loss_value",loss_value)
+      # loss_value tensor(137.5635, device='cuda:0', grad_fn=<MseLossBackward>)
+
+      optimizer.zero_grad()
+
+      loss_value.backward()
+  
+      optimizer.step()
+
+    print("one epoch end")
