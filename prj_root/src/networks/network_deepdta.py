@@ -60,40 +60,36 @@ class DeepDTA(nn.Module):
     # @ Convolution for smiles
     
     self.conv1_for_smiles=nn.Sequential(
-      nn.Conv2d(200,100,kernel_size=3,padding=1))
+      nn.Conv1d(100,128,kernel_size=4))
     self.conv2_for_smiles=nn.Sequential(
-      nn.Conv2d(200,100,kernel_size=3,padding=1))
+      nn.Conv1d(128,128,kernel_size=4))
     self.conv3_for_smiles=nn.Sequential(
-      nn.Conv2d(200,100,kernel_size=3,padding=1))
-
-    self.max_pool=nn.MaxPool1d(3,stride=2)
+      nn.Conv1d(128,128,kernel_size=4))
 
     # ================================================================================
     self.conv1_for_proteins=nn.Sequential(
-      nn.Conv2d(200,100,kernel_size=3,padding=1))
+      nn.Conv1d(1000,128,kernel_size=4))
     self.conv2_for_proteins=nn.Sequential(
-      nn.Conv2d(200,100,kernel_size=3,padding=1))
+      nn.Conv1d(128,128,kernel_size=4))
     self.conv3_for_proteins=nn.Sequential(
-      nn.Conv2d(200,100,kernel_size=3,padding=1))
-
-    self.max_pool=nn.MaxPool1d(3,stride=2)
+      nn.Conv1d(128,128,kernel_size=4))
 
     # ================================================================================
     # @ Fully connected layer
 
-    self.fc1=nn.Linear(input_size, output_size)
+    self.fc1=nn.Linear(60928,1024)
     self.relu1=nn.ReLU()
-    self.dropout1=torch.nn.Dropout(p=dropout_probability)
-    self.fc2=nn.Linear(input_size, output_size)
+    self.dropout1=torch.nn.Dropout(p=0.1)
+    self.fc2=nn.Linear(1024,512)
     self.relu2=nn.ReLU()
-    self.dropout2=torch.nn.Dropout(p=dropout_probability)
-    self.fc3=nn.Linear(input_size, output_size)
+    self.dropout2=torch.nn.Dropout(p=0.1)
+    self.fc3=nn.Linear(512,512)
     self.relu3=nn.ReLU()
 
     # ================================================================================
     # @ Output layer
 
-    self.fc_out=nn.Linear(input_size,1)
+    self.fc_out=nn.Linear(512,1)
 
   def forward(self,batch_drugs,batch_proteins):
 
@@ -110,10 +106,51 @@ class DeepDTA(nn.Module):
     # embedded_protein_data torch.Size([256, 1000, 128])
     
     # ================================================================================
-    # @ Perform convolution
+    # @ Perform convolution for "smiles data" and "protein data"
 
-
+    smiles_after_conv=self.conv1_for_smiles(embedded_smiles_data)
+    smiles_after_conv=self.conv2_for_smiles(smiles_after_conv)
+    smiles_after_conv=self.conv3_for_smiles(smiles_after_conv)
+    # print("smiles_after_conv",smiles_after_conv.shape)
+    # torch.Size([256, 128, 119])
+    smiles_after_max_pool, _  = torch.max(smiles_after_conv,1)
+    # smiles_after_max_pool=F.max_pool2d(smiles_after_conv,kernel_size=smiles_after_conv.size()[2:])
+    # print("smiles_after_max_pool",smiles_after_max_pool)
+    # print("smiles_after_max_pool",smiles_after_max_pool.shape)
+    # smiles_after_max_pool torch.Size([256, 119])
 
     # ================================================================================
+    protein_after_conv=self.conv1_for_proteins(embedded_protein_data)
+    protein_after_conv=self.conv2_for_proteins(protein_after_conv)
+    protein_after_conv=self.conv3_for_proteins(protein_after_conv)
+    protein_after_max_pool, _  = torch.max(protein_after_conv,1)
+    # print("protein_after_max_pool",protein_after_max_pool)
+    # print("protein_after_max_pool",protein_after_max_pool.shape)
+    # protein_after_max_pool torch.Size([256, 119])
+
+    # ================================================================================
+    concatenated_tensor=torch.cat((smiles_after_max_pool,protein_after_max_pool),-1)
+    # print("concatenated_tensor",concatenated_tensor.shape)
+    # concatenated_tensor torch.Size([256, 238])
+
+    # ================================================================================
+    flattened_tensor=concatenated_tensor.view(-1)
+    # print("flattened_tensor",flattened_tensor.shape)
+    # flattened_tensor torch.Size([60928])
+
+    # ================================================================================
+    out_from_fc1=self.fc1(flattened_tensor)
+    out_from_relu1=self.relu1(out_from_fc1)
+    out_from_dropout1=self.dropout1(out_from_relu1)
+    out_from_fc2=self.fc2(out_from_dropout1)
+    out_from_relu2=self.relu2(out_from_fc2)
+    out_from_dropout2=self.dropout2(out_from_relu2)
+    out_from_fc3=self.fc3(out_from_dropout2)
+    out_from_relu3=self.relu3(out_from_fc3)
+    out_from_fc_out=self.fc_out(out_from_relu3)
+    # print("out_from_fc_out",out_from_fc_out.shape)
+    # out_from_fc_out torch.Size([1])
+    # print("out_from_fc_out",out_from_fc_out)
+    # out_from_fc_out tensor([0.0098], device='cuda:0', grad_fn=<AddBackward0>)
 
     return x
